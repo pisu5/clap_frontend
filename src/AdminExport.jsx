@@ -139,11 +139,10 @@ export default function AdminExport() {
             <button
               onClick={downloadExcel}
               disabled={loading}
-              className={`w-full py-3 rounded-xl font-semibold text-white ${
-                loading
-                  ? "bg-green-400 cursor-not-allowed"
-                  : "bg-green-600 hover:bg-green-700"
-              }`}
+              className={`w-full py-3 rounded-xl font-semibold text-white ${loading
+                ? "bg-green-400 cursor-not-allowed"
+                : "bg-green-600 hover:bg-green-700"
+                }`}
             >
               {loading ? "Preparing..." : "Download Excel"}
             </button>
