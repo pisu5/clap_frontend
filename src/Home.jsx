@@ -132,7 +132,7 @@ export default function Home() {
     return (
         <div className="min-h-screen bg-slate-50 p-4 font-sans max-w-md mx-auto">
             <div className="bg-blue-600 text-white rounded-2xl p-6 shadow-lg mb-6">
-                <h1 className="text-xl font-bold tracking-tight">CLAP SURVEY</h1>
+                <h1 className="text-xl font-bold tracking-tight">Survey Remark</h1>
                 <div className="flex justify-between items-end mt-4">
                     <p className="text-sm opacity-90">ID: {surveyorId}</p>
                     <button onClick={logout} className="text-xs font-bold bg-blue-700 px-3 py-1 rounded-full">LOGOUT</button>
@@ -198,7 +198,7 @@ export default function Home() {
                         <div className="p-4 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50 text-center">
                             <input type="file" hidden id="call-upload" accept="audio/*" multiple onChange={(e) => handleFileChange(e, setRecordings, recordings)} />
                             <label htmlFor="call-upload" className="cursor-pointer text-sm font-bold text-blue-600">
-                                🎧 Add Recordings (Optional)
+                                🎧 Add Recordings 
                             </label>
                         </div>
                         <div className="mt-2 space-y-1">
