@@ -8,8 +8,10 @@ export default function AdminExport() {
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [usersFile, setUsersFile] = useState(null);
+  const [mobilesFile, setMobilesFile] = useState(null);
 
-  // 🔒 Protect admin-only access
+  // 🔒 Admin-only protection
   if (role !== "ADMIN") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
@@ -20,6 +22,9 @@ export default function AdminExport() {
     );
   }
 
+  // --------------------------
+  // DOWNLOAD REPORT
+  // --------------------------
   const downloadExcel = async () => {
     setLoading(true);
     setMessage("");
@@ -35,8 +40,8 @@ export default function AdminExport() {
       });
 
       const url = window.URL.createObjectURL(blob);
-
       const link = document.createElement("a");
+
       link.href = url;
       link.download = "survey_attempts_report.xlsx";
 
@@ -48,7 +53,59 @@ export default function AdminExport() {
 
       setMessage("Report downloaded successfully.");
     } catch (err) {
-      setMessage("Failed to download report. Please try again.");
+      setMessage("Failed to download report.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // --------------------------
+  // UPLOAD USERS SHEET
+  // --------------------------
+  const uploadUsers = async () => {
+    if (!usersFile) {
+      setMessage("Please select a users sheet first.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", usersFile);
+
+    setLoading(true);
+    setMessage("");
+
+    try {
+      const res = await api.post("/upload-users-excel", formData);
+      setMessage(`Users uploaded successfully. Inserted: ${res.data.inserted}`);
+      setUsersFile(null);
+    } catch (err) {
+      setMessage(err.response?.data?.detail || "Users upload failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // --------------------------
+  // UPLOAD MOBILE SHEET
+  // --------------------------
+  const uploadMobiles = async () => {
+    if (!mobilesFile) {
+      setMessage("Please select a mobile sheet first.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", mobilesFile);
+
+    setLoading(true);
+    setMessage("");
+
+    try {
+      const res = await api.post("/upload-mobiles-excel", formData);
+      setMessage(`Mobiles uploaded successfully. Inserted: ${res.data.inserted}`);
+      setMobilesFile(null);
+    } catch (err) {
+      setMessage(err.response?.data?.detail || "Mobiles upload failed.");
     } finally {
       setLoading(false);
     }
@@ -61,11 +118,12 @@ export default function AdminExport() {
 
   return (
     <div className="min-h-screen bg-slate-100 flex flex-col">
+
       {/* Header */}
       <div className="bg-slate-900 text-white p-4 text-center">
         <h1 className="text-lg font-semibold">Admin Panel</h1>
         <p className="text-xs text-slate-300">
-          Export survey reports
+          Manage system data
         </p>
       </div>
 
@@ -73,38 +131,83 @@ export default function AdminExport() {
       <div className="flex-1 p-6 flex items-center justify-center">
         <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8 space-y-6">
 
-          <h2 className="text-xl font-bold text-slate-800 text-center">
-            Download Survey Report
-          </h2>
+          {/* DOWNLOAD REPORT */}
+          <div className="space-y-3">
+            <h2 className="text-lg font-bold text-slate-800">
+              📥 Export Survey Report
+            </h2>
+            <button
+              onClick={downloadExcel}
+              disabled={loading}
+              className={`w-full py-3 rounded-xl font-semibold text-white ${
+                loading
+                  ? "bg-green-400 cursor-not-allowed"
+                  : "bg-green-600 hover:bg-green-700"
+              }`}
+            >
+              {loading ? "Preparing..." : "Download Excel"}
+            </button>
+          </div>
 
-          <p className="text-sm text-slate-500 text-center">
-            This Excel file contains all survey attempts grouped by mobile number.
-          </p>
+          {/* UPLOAD USERS */}
+          <div className="space-y-3 border-t pt-5">
+            <h2 className="text-lg font-bold text-slate-800">
+              👥 Upload Users Sheet
+            </h2>
 
-          <button
-            onClick={downloadExcel}
-            disabled={loading}
-            className={`w-full py-4 rounded-xl font-bold text-white transition-all ${
-              loading
-                ? "bg-green-400 cursor-not-allowed"
-                : "bg-green-600 hover:bg-green-700"
-            }`}
-          >
-            {loading ? "Preparing Excel..." : "📥 Download Excel"}
-          </button>
+            <input
+              type="file"
+              accept=".xlsx"
+              onChange={(e) => setUsersFile(e.target.files[0])}
+              className="w-full text-sm"
+            />
 
+            <button
+              onClick={uploadUsers}
+              disabled={loading}
+              className="w-full py-3 rounded-xl font-semibold bg-blue-600 text-white hover:bg-blue-700"
+            >
+              Upload Users
+            </button>
+          </div>
+
+          {/* UPLOAD MOBILES */}
+          <div className="space-y-3 border-t pt-5">
+            <h2 className="text-lg font-bold text-slate-800">
+              📱 Upload Client Mobiles Sheet
+            </h2>
+
+            <input
+              type="file"
+              accept=".xlsx"
+              onChange={(e) => setMobilesFile(e.target.files[0])}
+              className="w-full text-sm"
+            />
+
+            <button
+              onClick={uploadMobiles}
+              disabled={loading}
+              className="w-full py-3 rounded-xl font-semibold bg-indigo-600 text-white hover:bg-indigo-700"
+            >
+              Upload Mobiles
+            </button>
+          </div>
+
+          {/* MESSAGE */}
           {message && (
             <div className="text-center text-sm font-semibold text-slate-600">
               {message}
             </div>
           )}
 
+          {/* LOGOUT */}
           <button
             onClick={logout}
             className="w-full py-3 rounded-xl font-semibold bg-red-500 text-white hover:bg-red-600 transition-all"
           >
             🚪 Logout
           </button>
+
         </div>
       </div>
 
