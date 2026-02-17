@@ -25,12 +25,12 @@ export default function AdminExport() {
   // --------------------------
   // DOWNLOAD REPORT
   // --------------------------
-  const downloadExcel = async () => {
+  const downloadReport = async (endpoint, filename) => {
     setLoading(true);
     setMessage("");
 
     try {
-      const res = await api.get("/export-excel", {
+      const res = await api.get(endpoint, {
         responseType: "blob",
       });
 
@@ -43,7 +43,7 @@ export default function AdminExport() {
       const link = document.createElement("a");
 
       link.href = url;
-      link.download = "survey_attempts_report.xlsx";
+      link.download = filename;
 
       document.body.appendChild(link);
       link.click();
@@ -58,6 +58,7 @@ export default function AdminExport() {
       setLoading(false);
     }
   };
+
 
   // --------------------------
   // UPLOAD USERS SHEET
@@ -131,22 +132,64 @@ export default function AdminExport() {
       <div className="flex-1 p-6 flex items-center justify-center">
         <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8 space-y-6">
 
-          {/* DOWNLOAD REPORT */}
-          <div className="space-y-3">
+          {/* DOWNLOAD REPORTS */}
+          <div className="space-y-4">
             <h2 className="text-lg font-bold text-slate-800">
-              📥 Export Survey Report
+              📥 Export Survey Reports
             </h2>
+
+            {/* Summary */}
             <button
-              onClick={downloadExcel}
+              onClick={() =>
+                downloadReport(
+                  "/export-excel",
+                  "survey_summary_report.xlsx"
+                )
+              }
               disabled={loading}
               className={`w-full py-3 rounded-xl font-semibold text-white ${loading
                 ? "bg-green-400 cursor-not-allowed"
                 : "bg-green-600 hover:bg-green-700"
                 }`}
             >
-              {loading ? "Preparing..." : "Download Excel"}
+              📊 Summary Report (MIS)
+            </button>
+
+            {/* Attempt-wise */}
+            <button
+              onClick={() =>
+                downloadReport(
+                  "/export-excel-attempt-wise",
+                  "survey_attempt_wise_report.xlsx"
+                )
+              }
+              disabled={loading}
+              className={`w-full py-3 rounded-xl font-semibold text-white ${loading
+                ? "bg-yellow-400 cursor-not-allowed"
+                : "bg-yellow-600 hover:bg-yellow-700"
+                }`}
+            >
+              🔁 Attempt-wise Report (Ops)
+            </button>
+
+            {/* Audit */}
+            <button
+              onClick={() =>
+                downloadReport(
+                  "/export-excel-audit",
+                  "survey_audit_report.xlsx"
+                )
+              }
+              disabled={loading}
+              className={`w-full py-3 rounded-xl font-semibold text-white ${loading
+                ? "bg-red-400 cursor-not-allowed"
+                : "bg-red-600 hover:bg-red-700"
+                }`}
+            >
+              🧾 Audit Report (Legal)
             </button>
           </div>
+
 
           {/* UPLOAD USERS */}
           <div className="space-y-3 border-t pt-5">
